@@ -1,0 +1,84 @@
+CREATE DATABASE IF NOT EXISTS db_praktikum;
+USE db_praktikum;
+CREATE TABLE IF NOT EXISTS tbl_mhs
+(Nim INT PRIMARY KEY NOT NULL,
+Nama VARCHAR(20) NOT NULL,
+Jenis_Kelamin ENUM("P","L"),
+Alamat VARCHAR TEXT);
+
+INSERT INTO tbl_mhs VALUES
+("101", "Arif", "L", "Jl. Kenangan"),
+("102", "Budi", "L", "Jl. Jombang"),
+("103", "Wati", "P", "Jl. Surabaya"),
+("104", "Ika", "P", "Jl. Jombang"),
+("105", "Tono", "L", "Jl. Jakarta"),
+("106", "Iwan", "L", "Jl. Bandung"),
+("107", "Sari", "P", "Jl. Malang");
+
+CREATE TABLE IF NOT EXISTS ambil_mk 
+(Nim VARCHAR(7) NOT NULL,
+kode_mk VARCHAR (7) NOT NULL); 
+
+INSERT INTO `ambil_mk` 
+(`Nim`, `kode_mk`) VALUES 
+('101', 'PTI447'), 
+('103', 'TIK333'), 
+('104', 'PTI333'), 
+('104', 'PTI777'), 
+('111', 'PTI123'), 
+('123', 'PTI999'); 
+
+CREATE TABLE  IF NOT EXISTS matakuliah
+(kode_mk VARCHAR(7) PRIMARY KEY NOT NULL,
+nama_mk TEXT NOT NULL,
+sks CHAR(1) NOT NULL,
+semester CHAR(1) NOT NULL);
+
+INSERT INTO `matakuliah` 
+(`kode_mk`, `nama_mk`, `sks`, `semester`) VALUES 
+('PTI447', 'Praktikum Basis Data', '1', '3'),
+('TIK342', 'Praktikum Basis Data', '1', '3'),
+('PTI333', 'Basis Data Terdistribusi', '3', '5'),
+('TIK123', 'Jaringan Komputer', '2', '5'),
+('TIK333', 'Sistem Operasi', '3', '5'),
+('PTI123', 'Grafika Multimedia', '3', '5'),
+('PTI777', 'Sistem Informasi', '2', '3');
+
+//kesatu
+//eksplisit
+Select count(distinct tbl_mhs.Nim) 
+as mahasiswa_yang_mengambil_matkul 
+from tbl_mhs INNER JOIN ambil_mk 
+ON tbl_mhs.Nim = ambil_mk.Nim;
+//implisit
+Select count(distinct tbl_mhs.Nim) 
+as mahasiswa_yang_mengambil_matkul 
+from tbl_mhs, ambil_mk 
+WHERE tbl_mhs.Nim = ambil_mk.Nim;
+
+//kedua
+SELECT tbl_mhs.jenis_kelamin, COUNT(tbl_mhs.jenis_kelamin) AS jumlah 
+FROM tbl_mhs LEFT OUTER JOIN ambil_mk ON tbl_mhs.nim = ambil_mk.nim 
+WHERE ambil_mk.nim IS NULL
+GROUP BY tbl_mhs.jenis_kelamin;
+
+//ketiga
+//implisit
+SELECT tbl_mhs.nim, tbl_mhs.nama, matakuliah.kode_mk, matakuliah.nama_mk
+FROM tbl_mhs, matakuliah, ambil_mk
+WHERE tbl_mhs.nim = ambil_mk.nim AND ambil_mk.kode_mk = matakuliah.kode_mk;
+//eksplisit
+SELECT tbl_mhs.nim, tbl_mhs.nama, matakuliah.kode_mk, matakuliah.nama_mk
+FROM tbl_mhs INNER JOIN ambil_mk
+ON tbl_mhs.nim = ambil_mk.nim INNER JOIN matakuliah ON ambil_mk.kode_mk = matakuliah.kode_mk;
+
+//keempat
+SELECT tbl_mhs.nim, tbl_mhs.nama, SUM(matakuliah.sks) AS jumlah_sks
+FROM tbl_mhs INNER JOIN ambil_mk
+ON tbl_mhs.nim = ambil_mk.nim INNER JOIN matakuliah ON ambil_mk.kode_mk = matakuliah.kode_mk
+GROUP BY tbl_mhs.nama HAVING SUM(matakuliah.sks)>4 AND SUM(matakuliah.sks)<10;
+
+//kelima
+SELECT matakuliah.kode_mk, matakuliah.nama_mk, matakuliah.sks, matakuliah.semester
+FROM matakuliah LEFT OUTER JOIN ambil_mk
+ON ambil_mk.kode_mk = matakuliah.kode_mk LEFT OUTER JOIN tbl_mhs ON tbl_mhs.nim = ambil_mk.nim WHERE tbl_mhs.nim IS NULL;

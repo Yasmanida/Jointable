@@ -1,0 +1,28 @@
+CREATE DATABASE db_bisnis;
+CREATE TABLE tbl_cus(
+ customer_id VARCHAR(6) PRIMARY KEY NOT NULL,
+ customer_name VARCHAR(10),
+ customer_addres TEXT)
+CREATE TABLE tbl_order(
+ order_id VARCHAR(6),
+ order_date DATE,
+ customer_id VARCHAR(6)
+ qty integer,
+ amount integer)
+
+//inner join
+SELECT *
+FROM tbl_cus INNER JOIN tbl_order ON tbl_cus.customer_id = tbl_order.customer_id;
+//right join
+SELECT *
+FROM tbl_cus LEFT OUTER JOIN tbl_order ON tbl_cus.customer_id = tbl_order.customer_id;
+//left join
+SELECT *
+FROM tbl_cus RIGHT OUTER JOIN tbl_order ON tbl_cus.customer_id = tbl_order.customer_id;
+
+//union
+SELECT *
+FROM tbl_cus RIGHT OUTER JOIN tbl_order ON tbl_cus.customer_id = tbl_order.customer_id
+UNION
+SELECT *
+FROM tbl_cus LEFT OUTER JOIN tbl_order ON tbl_cus.customer_id = tbl_order.customer_id;
